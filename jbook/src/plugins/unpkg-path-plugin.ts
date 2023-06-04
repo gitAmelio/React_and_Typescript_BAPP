@@ -1,5 +1,20 @@
 import * as esbuild from 'esbuild-wasm';
 import axios from 'axios';
+import localForage from 'localforage';
+
+const fileCache = localForage.createInstance({
+  name: 'filecache' // DB name
+});
+
+// just for testing
+(async () => {
+  await fileCache.setItem('color', 'red');
+
+  const color = await fileCache.getItem('color');
+
+  console.log(color)
+})();
+
 
 // faking a file system for esbuild
 // by overwriting 'onResolve' and 'onLoad'
@@ -37,17 +52,32 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-              import React from 'react';
+              import React, {useState} from 'react-select';
               console.log(React)
             `,
           };
         }
+
+        // Check to see if we have already fetch this file
+        // and if it is in the cache
+        const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(args.path);
+
+        // if it is, return it immediately
+        if (cachedResult) {
+          return cachedResult;
+        }
+
         const { data, request } = await axios.get(args.path)
-        return {
+       
+        const newFileData: esbuild.OnLoadResult = {
           loader: 'jsx',
           contents: data,
           resolveDir: new URL('./', request.responseURL).pathname
-        }
+        };
+        // store response in cache
+        await fileCache.setItem(args.path, newFileData)
+
+        return newFileData;
       });
     },
   };
