@@ -6,7 +6,16 @@ const fileCache = localForage.createInstance({
     name: 'filecache' // DB name
 });
 
+// const esbluildOnloadResult = (contents: string , request): esbuild.OnLoadResult =>{
+//     return {
+//         loader: 'jsx',
+//         contents,
+//         resolveDir: new URL('./', request.responseURL).pathname
+//     };
+// } 
+
 export const fetchPlugin = (inputCode: string) => {
+    
     return {
         name: 'fetch-plugin',
         setup(build: esbuild.PluginBuild){
@@ -32,6 +41,8 @@ export const fetchPlugin = (inputCode: string) => {
             build.onLoad({filter: /.css$/}, async (args: any) => {
                 
                 const { data, request } = await axios.get(args.path)
+
+                console.log('request: ',request)
             
                 const escaped = data
                     .replace(/\n/g, '')
@@ -59,6 +70,8 @@ export const fetchPlugin = (inputCode: string) => {
             build.onLoad({ filter: /.*/ }, async (args: any) => {
                
                 const { data, request } = await axios.get(args.path)
+
+                
             
                 const newFileData: esbuild.OnLoadResult = {
                 loader: 'jsx',
