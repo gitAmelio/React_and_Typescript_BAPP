@@ -1,3 +1,4 @@
+import './code-editor.css';
 import MonacoEditor from '@monaco-editor/react';
 import React, { useRef } from 'react';
 import type * as Monaco from 'monaco-editor/esm/vs/editor/editor.api';
@@ -42,7 +43,7 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({onChange, initialValue}) => {
                 useTabs: false, // don't format with tabs
                 semi: true,   // add semi colons at the end of expressions and declarations if missing
                 singleQuote: true // use single quotes for all strings
-            })
+            }).replace(/\n$/, '')
 
             // set the formatted value back in the editor
             editorRef.current.setValue(formatted);
@@ -52,8 +53,11 @@ const CodeEditor: React.FC<ICodeEditorProps> = ({onChange, initialValue}) => {
     }
 
     return (
-        <div>
-            <button onClick={onFormatClick}>Format</button>
+        <div className='editor-wrapper'>
+            <button
+                className='button button-format is-primary is small' 
+                onClick={onFormatClick}
+            >Format</button>
             <MonacoEditor
                 onMount={onEditorDidMount}
                 onChange={handleEditorChange}
