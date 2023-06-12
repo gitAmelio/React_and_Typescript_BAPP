@@ -18,8 +18,6 @@ interface ICodeEditorProps {
     onChange(value: string): void;
 }
 
-interface IStandaloneCodeEditor extends StandaloneCodeEditor {};
-
 const CodeEditor: React.FC<ICodeEditorProps> = ({onChange, initialValue}) => {
 
     const editorRef = useRef<StandaloneCodeEditor>();

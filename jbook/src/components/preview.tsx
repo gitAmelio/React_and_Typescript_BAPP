@@ -33,7 +33,7 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
     // reset iframe
     iframe.current.srcdoc = html;
 
-    // updating changed code;
+    // updating changed code - see #root event listener above
     iframe.current.contentWindow.postMessage(code, "*"); // need to match targetOrigin, "*" don't check
   }, [code]);
 
