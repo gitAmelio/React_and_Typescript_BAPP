@@ -15,9 +15,9 @@ const html = `
                     eval(event.data);
                 } catch (err) {
                     const root = document.querySelector('#root');
-                    root.innerHTML = '<div style="color: red"><h4>Runtime Error</h4>'+ err + '</div>';
-                    // rethrow error to console
-                    console.error(err);
+                    root.innerHTML = '<div style="color: blue"><h4>Runtime Error</h4>'+ err + '</div>';
+                    rethrow error to console
+                    // console.error(err);
                 }
             }, false);
         </script>
@@ -32,18 +32,24 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
   useEffect(() => {
     // reset iframe
     iframe.current.srcdoc = html;
-
-    // updating changed code - see #root event listener above
-    iframe.current.contentWindow.postMessage(code, "*"); // need to match targetOrigin, "*" don't check
+    setTimeout(()=>{
+      // updating changed code - see #root event listener above
+      iframe.current.contentWindow.postMessage(code, "*"); // need to match targetOrigin, "*" don't check
+    },50)
   }, [code]);
 
   return (
-    <iframe
-      title="code preview"
-      ref={iframe}
-      sandbox="allow-scripts"
-      srcDoc={html}
-    />
+    <div className="preview-wrapper flex-child">
+      <iframe
+        
+        style={{ background: 'white', width: '100%', height: '100%'}}
+        title="code preview"
+        ref={iframe}
+        sandbox="allow-scripts"
+        srcDoc={html}
+      />
+    </div>
+
   );
 };
 
