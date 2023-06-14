@@ -7,12 +7,14 @@ import Resizable from "./resizable";
 const CodeCell = () => {
   const [userCode, setUserCode] = useState("");
   const [code, setCode] = useState("");
+  const [err, setErr] = useState('');
   
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      const output = await bundle(userCode)
-      setCode(output);
+      const { code, err } = await bundle(userCode)
+      setCode(code);
+      setErr(err);
     }, 1000);
 
     // when userCode change clear timer
@@ -20,9 +22,6 @@ const CodeCell = () => {
       clearTimeout(timer);
     }
   }, [userCode]);
-
-  const onSubmitClick = async () => {
-  };
 
   return (
     <Resizable direction="vertical">
@@ -36,9 +35,8 @@ const CodeCell = () => {
         {/* <div>
           <button onClick={onSubmitClick}>Submit</button>
         </div> */}
-        <Preview code={code} />
+        <Preview code={code} err={err}/>
       </div>
-      <div className="shield"></div>
     </Resizable>
   );
 };

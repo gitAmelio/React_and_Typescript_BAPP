@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 
 interface PreviewProps {
   code: string;
+  err: string;
 }
 
 const html = `
@@ -10,14 +11,24 @@ const html = `
     <body>
         <div id="root"></div>
         <script>
+            const handleError = (err) => {
+              const root = document.querySelector('#root');
+              root.innerHTML = '<div style="color: red"><h4>Runtime Error</h4>'+ err + '</div>';
+              //rethrow error to console
+              console.error(err);
+            }
+            // catching asynchronous errors
+            window.addEventListener('error', (event) => {
+              event.preventDefault();
+              handleError(event.error);
+            });
+
             window.addEventListener('message', (event) => {
+                // event.preventDefault();
                 try {
                     eval(event.data);
                 } catch (err) {
-                    const root = document.querySelector('#root');
-                    root.innerHTML = '<div style="color: blue"><h4>Runtime Error</h4>'+ err + '</div>';
-                    rethrow error to console
-                    // console.error(err);
+                  handleError(err);
                 }
             }, false);
         </script>
@@ -25,7 +36,7 @@ const html = `
 </html>
 `;
 
-const Preview: React.FC<PreviewProps> = ({ code }) => {
+const Preview: React.FC<PreviewProps> = ({ code, err }) => {
   const iframe = useRef<any>();
 
   // on 'code' changed
@@ -41,13 +52,13 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
   return (
     <div className="preview-wrapper flex-child">
       <iframe
-        
         style={{ background: 'white', width: '100%', height: '100%'}}
         title="code preview"
         ref={iframe}
         sandbox="allow-scripts"
         srcDoc={html}
       />
+      {err && <div className="user-code-error">{err}</div>}
     </div>
 
   );
