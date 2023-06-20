@@ -9,6 +9,7 @@ const TextEditor: React.FC = () => {
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
+    console.log('test2')
     const listener = (event: MouseEvent) => {
       if (
         ref.current && 

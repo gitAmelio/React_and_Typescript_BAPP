@@ -9,6 +9,7 @@ import TextEditor from "./components/text-editor";
 const root = createRoot(document.getElementById("root")!);
 
 const App = () => {
+  console.log('test3');
   return (
     <Provider store={store}>
       <>
