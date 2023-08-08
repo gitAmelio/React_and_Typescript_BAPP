@@ -19,23 +19,56 @@ const initialState: CellsState = {
   data : {}
 }
 
+/**
+ * 
+ *   ┌──────────────────────────────────────────────────────────────────────────────────┐
+ *   │                                                                                  │
+ *   │                ┌─  ┌───────┐    ┌───────────────────────────────────────────┐    │
+ *   │                │   │ 'abc' ├───►│ {id:'def', type: 'text', content: 'abc'}  │    │
+ *   │                │   └───────┘    └───────────────────────────────────────────┘    │
+ *   │       ┌──────┐ │   ┌───────┐    ┌───────────────────────────────────────────┐    │
+ *   │       │ data ├─┤   │ 'def' ├───►│ {id:'def', type: 'text', content: 'def'}  │    │
+ *   │       └──────┘ │   └───────┘    └───────────────────────────────────────────┘    │
+ *   │                │   ┌───────┐    ┌───────────────────────────────────────────┐    │
+ *   │                │   │ 'hij' ├───►│ {id:'hij', type: 'text', content: 'hij'}  │    │
+ *   │                └─  └───────┘    └───────────────────────────────────────────┘    │
+ *   │                                                                                  │
+ *   │       ┌──────┐ ┌─ ┌───────┐  ┌───────┐  ┌───────┐                                │
+ *   │       │ order├─┤  │ 'hij' │  │ 'def' │  │ 'abc' │                                │
+ *   │       └──────┘ └─ └───────┘  └───▲───┘  └───▲───┘                                │
+ *   │                                  │          │                                    │
+ *   └──────────────────────────────────┼──────────┼────────────────────────────────────┘
+ *                               ┌──────┘          └─┐
+ *                               │                   │
+ *                          ┌────┴────┐     ┌────────┴───────┐
+ *                          │ index   │  +  │  targetIndex   │
+ *                          └─────────┘     └────────────────┘
+ *                                direction === 'down'
+ *
+ */
+
 const reducer = produce((
   state: CellsState = initialState, 
   action: Action
-  ) => {
+  ): CellsState => {
     switch (action.type) {
       case ActionType.UPDATE_CELL: 
         const { id, content } = action.payload;
-        // with immer u can replace the following:
-        // const cellData = state.data[id]
-        // return {
-        //   ...state,
-        //   [id]: {
-        //     ...cellData,
-        //     content
-        //   }
-        // }; 
-        // with just
+        /**
+         * With 'immer' u can replace the following:
+         * 
+         * const cellData = state.data[id]
+         * return {
+         *   ...state,
+         *   [id]: {
+         *     ...cellData,
+         *     content
+         *   }
+         * };
+         *  
+         * with just
+         */ 
+
         state.data[id].content = content;
         return state;
       case ActionType.DELETE_CELL:
@@ -56,11 +89,12 @@ const reducer = produce((
           return state;
         }
         
+        // swap cell's indices in the 'order' array
         state.order[index] = state.order[targetIndex];
         state.order[targetIndex] = action.payload.id
 
         return state;
-      case ActionType.INSERT_CELL_BEFORE:
+      case ActionType.INSERT_CELL_AFTER:
         const cell: Cell = {
           content: '',
           type: action.payload.type,
@@ -68,20 +102,21 @@ const reducer = produce((
         }
 
         state.data[cell.id] = cell;
-        const beforeCellIndex = state.order.findIndex(id => id === action.payload.id);
+        const foundIndex = state.order.findIndex(id => id === action.payload.id);
 
-        if (beforeCellIndex < 0) {
-          state.order.push(cell.id);
+        if (foundIndex < 0) {
+          state.order.unshift(cell.id); // add to the end
         } else {
-          state.order.splice(beforeCellIndex, 0, cell.id)
+          state.order.splice(foundIndex + 1, 0, cell.id) // add at 'foundIndex + 1'
         }
 
         return state;
       default:
         return state; 
-
+      // TS will get an option of undefined if 'state' is not returned. 
     }
-});
+   
+}, initialState);
 
 const randomId = () => {
   // return Math.random().toString(36).substr(2,5)

@@ -1,49 +1,67 @@
-import { useRef } from "react";
 import * as esbuild from "esbuild-wasm";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugins";
 
-let isEsbuildRunning = false; // closure's state
+// wasmURL: 'https://unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm',
+// wasmURL: 'https://unpkg.com/esbuild-wasm/esbuild.wasm',
 
-const bundle = async (userCode: string) => {
+export class BundleService {
+  private static _instance: BundleService | null = null;
 
-  // esbuild can only be initialize once
-  if (!isEsbuildRunning){
-    await esbuild.initialize({
-      worker: true,
-      wasmURL: "/esbuild.wasm",
-      // wasmURL: 'https://unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm',
-      // wasmURL: 'https://unpkg.com/esbuild-wasm/esbuild.wasm',
-    });
-    isEsbuildRunning = true;
+  private static isLoaded = () => {
+    return BundleService._instance ? true : false;
   }
 
-  try {
-    const result = await esbuild.build({
-      entryPoints: ["index.js"],
-      bundle: true,
-      write: false,
-      plugins: [unpkgPathPlugin(), fetchPlugin(userCode)],
-      define: {
-        "process.env.NODE_ENV": '"production"',
-        global: "window",
-      },
-    });
-    return {
-      code: result.outputFiles[0].text,
-      err: ''
+  public static startService = async () => {
+    if (!this.isLoaded()) {
+      await esbuild.initialize({
+        worker: true,
+        wasmURL: "/esbuild.wasm",
+      })
+      BundleService._instance = new BundleService();
     }
-
-  } catch (err: any) { 
-    return {
-      code: '',
-      err: err.message
-    }
+    return BundleService._instance;
   }
 
-};
+  private constructor() {}
 
-export default bundle;
+  public static getInstance = (): BundleService => {
+    return BundleService._instance!;
+  };
 
+  public static build = async (userCode: string) => {
 
+    await this.startService()
 
+    if (!this.isLoaded()) {
+      return {
+        code: '',
+        err: ''
+      }
+    }
+
+    try {
+      const result = await esbuild.build({
+        entryPoints: ["index.js"],
+        bundle: true,
+        write: false,
+        plugins: [unpkgPathPlugin(), fetchPlugin(userCode)],
+        define: {
+          "process.env.NODE_ENV": '"production"',
+          global: "window",
+        },
+      });
+      return {
+        code: result.outputFiles[0].text,
+        err: ''
+      }
+    } catch (err: any) { 
+      return {
+        code: '',
+        err: err.message
+      }
+    }
+  }
+  
+
+}
