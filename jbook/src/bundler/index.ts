@@ -1,47 +1,20 @@
-import * as esbuild from "esbuild-wasm";
+// import * as esbuild from "esbuild-wasm";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugins";
+import startService from './esbuild';
 
 // wasmURL: 'https://unpkg.com/esbuild-wasm@0.8.27/esbuild.wasm',
 // wasmURL: 'https://unpkg.com/esbuild-wasm/esbuild.wasm',
 
 export class BundleService {
   private static _instance: BundleService | null = null;
-
-  private static isLoaded = () => {
-    return BundleService._instance ? true : false;
-  }
-
-  public static startService = async () => {
-    if (!this.isLoaded()) {
-      await esbuild.initialize({
-        worker: true,
-        wasmURL: "/esbuild.wasm",
-      })
-      BundleService._instance = new BundleService();
-    }
-    return BundleService._instance;
-  }
-
-  private constructor() {}
-
-  public static getInstance = (): BundleService => {
-    return BundleService._instance!;
-  };
+  private static isLoading: boolean = false;
 
   public static build = async (userCode: string) => {
 
-    await this.startService()
-
-    if (!this.isLoaded()) {
-      return {
-        code: '',
-        err: ''
-      }
-    }
-
     try {
-      const result = await esbuild.build({
+      // console.log('startService::', startService )
+      const result = await startService.build({
         entryPoints: ["index.js"],
         bundle: true,
         write: false,

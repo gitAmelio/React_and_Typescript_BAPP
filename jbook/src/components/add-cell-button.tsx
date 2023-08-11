@@ -12,11 +12,11 @@ const AddCellButton: React.FC<AddCellButtonProp> = ({previousCellId, cellType}) 
 
   return (
     <button className="button is-rounded is-primary is-small" 
-            onClick={() => insertCellAfter(previousCellId, 'code')}>
+            onClick={() => insertCellAfter(previousCellId, cellType === 'text' ? 'text' : 'code')}>
       <span className="icon is-small">
         <i className="fas fa-plus" />
       </span>
-      <span>{previousCellId === 'text' ? 'Text' : 'Code'}</span>
+      <span>{cellType === 'text' ? 'Text' : 'Code'}</span>
     </button>
   )
 }
