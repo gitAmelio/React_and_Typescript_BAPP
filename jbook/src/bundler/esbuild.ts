@@ -50,4 +50,3 @@ async function loadStartService() {
 }
 
 export default await loadStartService();
-

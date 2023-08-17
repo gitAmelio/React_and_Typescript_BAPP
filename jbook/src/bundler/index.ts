@@ -23,6 +23,10 @@ export class BundleService {
           "process.env.NODE_ENV": '"production"',
           global: "window",
         },
+        // to allow users to do their own React imports 
+        // replace React's default functions with the follow:
+        jsxFactory: '_React.createElement',
+        jsxFragment: '_React.Fragment'
       });
       return {
         code: result.outputFiles[0].text,

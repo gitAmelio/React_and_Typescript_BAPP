@@ -1,0 +1,10 @@
+.cell-list {
+  margin: 0 25px 50vh;
+}
+
+.react-draggable-transparent-selection .cell-list {
+  /* add full screen margin at the very bottom of the list 
+    to prevent the last cell from snapping when resized.
+  */
+  margin-bottom: 100vh; 
+}

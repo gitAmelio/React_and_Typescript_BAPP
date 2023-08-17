@@ -1,46 +1,47 @@
 import './code-cell.css';
-import { useEffect } from "react";
+import { createSelector } from 'reselect'
+import { Cell, RootState } from "../state";
+import { useSelector } from 'react-redux';
+import { useEffect, useMemo } from "react";
 import CodeEditor from "./code-editor";
 import Preview from "./preview";
 import Resizable from "./resizable";
-import { Cell } from "../state";
 import { useActions } from "../hooks/use-actions";
 import { useTypedSelector } from "../hooks/use-typed-selected";
-
+import { useSelectCumulativeCode, useSelectBundleItem } from '../hooks/use-typed-selected';
 
 interface CodeCellProps {
   cell: Cell;
 }
 
-const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
-  // const [code, setCode] = useState("");
-  // const [err, setErr] = useState('');
+const CodeCell: React.FC<CodeCellProps> = ({cell}) => {
   const { updateCell, createBundle } = useActions();
-  const bundle = useTypedSelector((state) => state.bundles[cell.id]);
+  const bundle = useSelectBundleItem(cell.id);
+  const cumulativeCode = useSelectCumulativeCode(cell.id)
+
+  // console.log('cumulativeCode: ',cumulativeCode);
+  // console.log('renders');
 
   useEffect(() => {
     if (!bundle) {
-      createBundle(cell.id, cell.content);
+      createBundle(cell.id, cumulativeCode);
       return;
     }
 
     const timer = setTimeout(async  () => {
       try {
-        // const { code, err } = await BundleService.build(cell.content)
-        // setCode(code);
-        // setErr(err);
-        createBundle(cell.id, cell.content)
+        createBundle(cell.id, cumulativeCode);
       } catch (error) {
         
       }
     }, 1000);
 
-    // when userCode change clear timer
+    // when user code change clear timer
     return () => {
       clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cell.content, cell.id]);
+  }, [cumulativeCode, cell.id]);
 
   return (
     <Resizable direction="vertical">
