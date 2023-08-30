@@ -1,7 +1,4 @@
 import * as esbuild from "esbuild-wasm";
-import { useMemo } from "react";
-
-type BR = esbuild.BuildResult;
 
 // Global variable
 let startService: any = null;
@@ -45,7 +42,7 @@ async function setStartService() {
 // Async function that uses async/await to wait for the global value to be set
 async function loadStartService() {
   await setStartService();
-  const temp = await waitForGlobalValue();
+  await waitForGlobalValue();
   return startService
 }
 

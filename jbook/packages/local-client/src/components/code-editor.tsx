@@ -20,7 +20,8 @@ interface ICodeEditorProps {
 
 const CodeEditor: React.FC<ICodeEditorProps> = ({ onChange, initialValue }) => {
   const editorRef = useRef<StandaloneCodeEditor>();
-  const [err, setErr] = useState("");
+  // const [err, setErr] = useState("")[];
+  const err = useState("")[0];
 
   const onEditorDidMount = (editor: StandaloneCodeEditor, monaco: any) => {
     editorRef.current = editor;

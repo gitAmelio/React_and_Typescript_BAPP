@@ -1,13 +1,10 @@
 import './code-cell.css';
-import { createSelector } from 'reselect'
-import { Cell, RootState } from "../state";
-import { useSelector } from 'react-redux';
-import { useEffect, useMemo } from "react";
+import { Cell } from "../state";
+import { useEffect } from "react";
 import CodeEditor from "./code-editor";
 import Preview from "./preview";
 import Resizable from "./resizable";
 import { useActions } from "../hooks/use-actions";
-import { useTypedSelector } from "../hooks/use-typed-selected";
 import { useSelectCumulativeCode, useSelectBundleItem } from '../hooks/use-typed-selected';
 
 interface CodeCellProps {

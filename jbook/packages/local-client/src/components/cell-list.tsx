@@ -1,5 +1,4 @@
 import './cell-list.css';
-import { useSelector } from 'react-redux'
 import { Fragment } from "react";
 import { useSelectOrderedCells } from '../hooks/use-typed-selected';
 import CellListItem from "./cell-list-item";
