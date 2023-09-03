@@ -1,4 +1,5 @@
 import { Dispatch } from "react";
+import axios from 'axios';
 import { ActionType } from "../action-types";
 import { 
   UpdateCellAction, 
@@ -8,8 +9,9 @@ import {
   Direction,
   Action
 } from "../actions";
-import { CellTypes } from "../cell";
+import { Cell, CellTypes } from "../cell";
 import { BundleService } from "../../bundler";
+import { RootState } from "../reducers";
  
 export const updateCell = (id: string, content: string): UpdateCellAction => {
   return {
@@ -68,4 +70,44 @@ export const createBundle = (cellId: string, input: string) => {
       }
     })
   };
+}
+
+export const fetchCells = () => {
+  return async (dispatch: Dispatch<Action>) => { // ensures strongly typed action
+    dispatch ({ type: ActionType.FETCH_CELLS});
+
+    try {
+      const { data }: { data: Cell[] } = await axios.get('cells');
+      dispatch({
+        type: ActionType.FETCH_CELLS_COMPLETE,
+        payload: data
+      });
+
+    } catch (err: any) {
+      dispatch({
+        type: ActionType.FETCH_CELLS_ERROR,
+        payload: err.message
+      })
+    }
+  }
+};
+
+export const saveCells = () => {
+  // use the second argument of the redux-thunk function to access state
+  return async (dispatch: Dispatch<Action>, getState: () => RootState) => {
+    const { cells: { data, order } } = getState();
+
+    const cells = order.map(id => data[id]);
+
+    try {
+      await axios.post('/cells', { cells });
+    } catch (err: any) {
+      dispatch({
+        type: ActionType.SAVE_CELLS_ERROR,
+        payload: err.message
+      })
+    }
+
+
+  }
 }

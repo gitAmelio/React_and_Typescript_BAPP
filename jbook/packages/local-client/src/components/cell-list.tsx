@@ -1,11 +1,22 @@
 import './cell-list.css';
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { useSelectOrderedCells } from '../hooks/use-typed-selected';
 import CellListItem from "./cell-list-item";
 import AddCell from "./add-cell";
+import { useActions } from '../hooks/use-actions';
 
 const CellList: React.FC = () => {
   const cellsMemoized = useSelectOrderedCells();
+
+  const { fetchCells, saveCells } = useActions();
+
+  useEffect(() => {
+    fetchCells();
+  },  []);
+
+  useEffect(() => {
+    saveCells();
+  }, [JSON.stringify(cellsMemoized)]);
 
   const renderedCells = cellsMemoized.map((cell)=>{
     return <Fragment key={cell.id}>
