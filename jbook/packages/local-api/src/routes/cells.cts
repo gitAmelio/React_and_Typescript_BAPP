@@ -1,6 +1,9 @@
-import express from 'express';
-import fs from 'fs';
+import express, { Router, Express } from 'express';
 import path from 'path';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import axios from 'axios';
+
+import { notebookReader, notebookWriter } from './notebook-io.cjs';
 
 interface Cell {
   id: string;
@@ -9,53 +12,55 @@ interface Cell {
 }
 
 // ?: had to commented out declaration in tsconfig.json
-export const createCellsRouter = (filename: string, dir: string) => {
-  const router = express.Router();
+export const createCellsRouter = (filename: string, dir: string): Router => {
+  const router = Router();
   router.use(express.json()) // to get access body
 
-
-  const { promises: fsp } = fs;
-
-  const fullPath = path.join(dir, filename); 
-
   router.get('/cells', async (req, res) => {
-  
-    try {
-      // Read the file
-      const result = await fsp.readFile(fullPath, { encoding: 'utf-8'});
-      
-      res.send(JSON.parse(result));
-    } catch (err: any) {
-      // if file does not exist
-      if (err.code === 'ENOENT') { 
-        // check if dir exist, if not create it recursively
-        fs.mkdirSync(dir, { recursive: true });
-        // Add code to create a file and add default cells
-        console.log('writing to file', fullPath)
-        await fsp.writeFile(fullPath, '[]', 'utf-8');
-        console.log('done writing')
-        res.send([]);
-      } else {
-        //  rethrow error
-        throw err;
-      }
 
-    }
+    notebookReader(res, dir, filename, (err, data) => {
+      if (err) {
+        console.log('Read Error on Notebook.js')
+      } else {
+        console.log('Data from notebook', data);
+        res.send(data);
+      }
+    })
+
   });
 
   router.post('/cells', async (req, res) => {
-    // File will be created if it does not exist
-
-    // Take the list of cells from the request obj
-    // serialize them
-    // note: the body can only acces if it has parsed
-    const { cells }: { cells: Cell[] } = req.body;
-
-    // Write the cells into the file
-    await fsp.writeFile(fullPath, JSON.stringify(cells), 'utf-8');
-
-    res.send({ status: 'OK'})
+    notebookWriter(req, res, dir, filename);
   });
 
   return router;
+}
+
+export async function setDynamicPath (app: Express) {
+
+  let isLive: boolean = false;
+
+  try {
+    const response = await axios.get('http://localhost:3000/is-live.json');
+ 
+    isLive = response.data.reply || false;
+    
+    if (isLive) {
+      console.log('Serving from development');
+      app.use('/static', express.static(path.join(__dirname, 'build')));
+      app.use(createProxyMiddleware({
+        target: 'http://localhost:3000',
+        ws: true,
+        logLevel: 'silent'
+      }))
+      return;
+    }
+
+  }  catch (error) {
+    console.log('');
+  }
+
+  console.log('Serving from production');
+  const packagePath = require.resolve('local-client/build/index.html');
+  app.use(express.static(path.dirname(packagePath)));
 }

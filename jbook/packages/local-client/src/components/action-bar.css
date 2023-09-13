@@ -3,17 +3,23 @@
   /* margin: 40px 10px; */
 }  
 
+.cell-list-item:hover .action-bar {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
 .action-bar {
   position: absolute;
   top: 0;
   right: 0;
   z-index: 10;
-  opacity: 0.25;
+  opacity: 0;
   transition: opacity 0.3s;
 }
 
 .action-bar:hover {
   opacity: 1;
+  transition: opacity 0.3s;
 }
 
 .action-bar-wrapper {

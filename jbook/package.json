@@ -2,7 +2,6 @@
   "name": "jbook",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev_live": "pnpm run -r --parallel start",

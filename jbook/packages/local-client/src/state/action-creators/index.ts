@@ -51,7 +51,7 @@ export const insertCellAfter = (id: string | null, type: CellTypes ): InsertCell
 };
 
 export const createBundle = (cellId: string, input: string) => {
-  
+
   return async (dispatch: Dispatch<Action>) => {
     dispatch({
       type: ActionType.BUNDLE_START,
@@ -98,6 +98,7 @@ export const saveCells = () => {
     const { cells: { data, order } } = getState();
 
     const cells = order.map(id => data[id]);
+
 
     try {
       await axios.post('/cells', { cells });

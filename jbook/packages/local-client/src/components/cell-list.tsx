@@ -16,7 +16,8 @@ const CellList: React.FC = () => {
 
   useEffect(() => {
     saveCells();
-  }, [JSON.stringify(cellsMemoized)]);
+  }, [JSON.stringify(cellsMemoized), saveCells]);
+  // }, [JSON.stringify(cellsMemoized)]);
 
   const renderedCells = cellsMemoized.map((cell)=>{
     return <Fragment key={cell.id}>

@@ -4,7 +4,6 @@ import { Provider } from "react-redux";
 import { store } from "./state";
 import { createRoot } from "react-dom/client";
 import CellList from "./components/cell-list";
-
 import './index.css'
 
 const root = createRoot(document.getElementById("root")!);

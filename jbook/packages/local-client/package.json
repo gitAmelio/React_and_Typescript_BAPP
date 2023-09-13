@@ -20,6 +20,7 @@
     "@types/react-dom": "^18.2.4",
     "@types/react-redux": "^7.1.25",
     "@types/reselect": "^2.2.0",
+    "@types/websocket": "^1.0.6",
     "@uiw/react-md-editor": "^3.23.3",
     "axios": "^1.4.0",
     "bulmaswatch": "^0.8.1",
@@ -39,10 +40,11 @@
     "redux-thunk": "^2.4.2",
     "reselect": "^4.1.8",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "websocket": "^1.0.34"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env NODE_ENV=production react-scripts start",
     "build:react": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
